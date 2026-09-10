@@ -1,65 +1,28 @@
 package ir.sakhtemanyar.app;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.view.Gravity;
-import android.view.View;
-import android.widget.*;
+import android.app.*;import android.os.*;import android.graphics.*;import android.graphics.drawable.GradientDrawable;import android.view.*;import android.widget.*;import org.json.*;import java.io.*;import java.net.*;import java.nio.charset.StandardCharsets;
 
-public class MainActivity extends Activity {
-    LinearLayout root;
-    int teal = Color.rgb(15,118,110);
-    int ink = Color.rgb(15,23,42);
-
-    @Override public void onCreate(Bundle b) {
-        super.onCreate(b);
-        showLogin();
-    }
-
-    TextView text(String s, int size, boolean bold) {
-        TextView t = new TextView(this); t.setText(s); t.setTextSize(size); t.setTextColor(ink);
-        t.setGravity(Gravity.RIGHT); t.setTypeface(Typeface.DEFAULT, bold ? Typeface.BOLD : Typeface.NORMAL);
-        t.setPadding(0, 8, 0, 8); return t;
-    }
-    EditText input(String hint, boolean password) {
-        EditText e = new EditText(this); e.setHint(hint); e.setTextSize(16); e.setGravity(Gravity.RIGHT);
-        e.setSingleLine(true); e.setPadding(24, 12, 24, 12);
-        if(password) e.setInputType(0x81); return e;
-    }
-    Button button(String label) {
-        Button b = new Button(this); b.setText(label); b.setTextSize(15); b.setTextColor(Color.WHITE); b.setAllCaps(false);
-        b.setBackgroundColor(teal); return b;
-    }
-    void base(String title, String subtitle) {
-        root = new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL); root.setGravity(Gravity.TOP|Gravity.RIGHT);
-        root.setPadding(28, 42, 28, 28); root.setBackgroundColor(Color.rgb(248,250,252)); root.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        TextView h=text(title,30,true); h.setTextColor(teal); root.addView(h);
-        root.addView(text(subtitle,15,false)); setContentView(root);
-    }
-    void showLogin() {
-        base("ساختمان‌یار", "مدیریت ساده، شفاف و امن ساختمان");
-        EditText user=input("نام کاربری",false), pass=input("رمز عبور",true); root.addView(user); root.addView(pass);
-        Button login=button("ورود به سامانه"); LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,60); lp.setMargins(0,24,0,12); root.addView(login,lp);
-        Button register=button("ثبت مدیر اولیه"); root.addView(register);
-        root.addView(text("نسخه اولیه: تأیید ایمیلی فعال نیست",13,false));
-        login.setOnClickListener(v -> showDashboard("مدیر ساختمان"));
-        register.setOnClickListener(v -> showRegister());
-    }
-    void showRegister() {
-        base("ثبت مدیر اولیه", "ساختمان خود را ایجاد کنید و دوره آزمایشی را شروع کنید");
-        EditText u=input("نام کاربری",false), p=input("رمز عبور",true), p2=input("تکرار رمز عبور",true);
-        root.addView(u); root.addView(p); root.addView(p2);
-        Button create=button("ثبت مدیر و شروع دوره آزمایشی"); LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,64); lp.setMargins(0,24,0,12); root.addView(create,lp);
-        Button back=button("بازگشت به ورود"); root.addView(back);
-        create.setOnClickListener(v -> { if(u.length()==0 || p.length()<4 || !p.getText().toString().equals(p2.getText().toString())) { Toast.makeText(this,"اطلاعات ورود را بررسی کنید",Toast.LENGTH_SHORT).show(); return; } showDashboard("مدیر ساختمان"); });
-        back.setOnClickListener(v -> showLogin());
-    }
-    void showDashboard(String role) {
-        base("داشبورد مدیر", "دوره آزمایشی فعال است • تنظیمات اشتراک از پنل مدیرکل کنترل می‌شود");
-        String[] cards={"شارژ ماه جاری\n۰ تومان","بدهی واحدها\n۰ تومان","هزینه تعمیرات\n۰ تومان","موجودی صندوق\n۰ تومان"};
-        for(String c:cards){ TextView tv=text(c,19,true); tv.setBackgroundColor(Color.WHITE); tv.setPadding(24,22,24,22); LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,82); p.setMargins(0,8,0,8); root.addView(tv,p); }
-        Button units=button("مدیریت واحدها و ساکنان"); root.addView(units); Button costs=button("شارژ، هزینه‌ها و تعمیرات"); root.addView(costs); Button reports=button("گزارش مالی و گردش حساب"); root.addView(reports);
-    }
+public class MainActivity extends Activity{
+ static final String API="https://okizneyesdwiundvadpe.supabase.co/functions/v1/api"; LinearLayout root; String session=""; JSONObject building;
+ int teal=Color.rgb(13,148,136),ink=Color.rgb(15,23,42),bg=Color.rgb(246,248,250);
+ public void onCreate(Bundle b){super.onCreate(b);getWindow().setStatusBarColor(Color.rgb(15,23,42));showLogin();}
+ TextView tv(String s,int z,boolean bold){TextView t=new TextView(this);t.setText(s);t.setTextSize(z);t.setTextColor(ink);t.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);t.setTypeface(Typeface.DEFAULT,bold?Typeface.BOLD:Typeface.NORMAL);t.setPadding(20,10,20,10);return t;}
+ EditText inp(String h,boolean pass){EditText e=new EditText(this);e.setHint(h);e.setTextSize(16);e.setGravity(Gravity.RIGHT);e.setSingleLine(true);e.setPadding(20,10,20,10);if(pass)e.setInputType(0x81);return e;}
+ Button btn(String s){Button b=new Button(this);b.setText(s);b.setTextSize(15);b.setTextColor(Color.WHITE);b.setAllCaps(false);GradientDrawable g=new GradientDrawable();g.setColor(teal);g.setCornerRadius(22);b.setBackground(g);return b;}
+ void base(String title,String sub){root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);root.setPadding(22,25,22,25);root.setBackgroundColor(bg);root.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);ScrollView sc=new ScrollView(this);sc.addView(root);setContentView(sc);TextView h=tv(title,29,true);h.setTextColor(teal);root.addView(h);root.addView(tv(sub,14,false));}
+ void showLogin(){base("ساختمان‌یار","مدیریت ساده، شفاف و امن ساختمان");EditText u=inp("نام کاربری مدیر",false),p=inp("رمز عبور",true);root.addView(u);root.addView(p);Button l=btn("ورود به سامانه");margin(l,16,0,8,0);root.addView(l);Button r=btn("ثبت مدیر اولیه");root.addView(r);root.addView(tv("تأیید ایمیلی فعلاً فعال نیست.",13,false));l.setOnClickListener(v->{JSONObject q=new JSONObject();put(q,"action","login_manager");put(q,"username",u.getText().toString());put(q,"password",p.getText().toString());request(q);});r.setOnClickListener(v->showRegister());}
+ void showRegister(){base("ثبت مدیر اولیه","ساختمان خود را ایجاد کنید و دوره آزمایشی را شروع کنید");EditText n=inp("نام ساختمان",false),a=inp("آدرس (اختیاری)",false),u=inp("نام کاربری",false),p=inp("رمز عبور حداقل ۶ کاراکتر",true),p2=inp("تکرار رمز عبور",true);root.addView(n);root.addView(a);root.addView(u);root.addView(p);root.addView(p2);Button c=btn("ثبت مدیر و شروع دوره آزمایشی");margin(c,16,0,8,0);root.addView(c);Button back=btn("بازگشت");root.addView(back);c.setOnClickListener(v->{if(u.length()==0||p.length()<6||!p.getText().toString().equals(p2.getText().toString())){toast("نام کاربری و رمز عبور را بررسی کنید");return;}JSONObject q=new JSONObject();put(q,"action","register_manager");put(q,"building_name",n.getText().toString());put(q,"address",a.getText().toString());put(q,"username",u.getText().toString());put(q,"password",p.getText().toString());request(q);});back.setOnClickListener(v->showLogin());}
+ void showDashboard(){String name="ساختمان من",st="trial",ex="";try{name=building.optString("name",name);st=building.optString("subscription_status",st);ex=building.optString("subscription_expires_at","");}catch(Exception ignored){}base("داشبورد مدیر","ساختمان: "+name);root.addView(card("وضعیت اشتراک",st.equals("trial")?"دوره آزمایشی • پایان: "+ex:"اشتراک فعال • پایان: "+ex));root.addView(card("شارژ ماه جاری","۰ تومان"));root.addView(card("بدهی واحدها","۰ تومان"));root.addView(card("هزینه تعمیرات","۰ تومان"));root.addView(card("موجودی صندوق","۰ تومان"));Button units=btn("🏢 مدیریت واحدها و ساکنان");Button costs=btn("💳 شارژ، هزینه‌ها و تعمیرات");Button reports=btn("📊 گزارش مالی و گردش حساب");Button plans=btn("⭐ اشتراک سامانه");Button refresh=btn("↻ بروزرسانی");Button out=btn("خروج");root.addView(units);root.addView(costs);root.addView(reports);root.addView(plans);root.addView(refresh);root.addView(out);units.setOnClickListener(v->unitsPage());costs.setOnClickListener(v->chargesPage());reports.setOnClickListener(v->loadDashboard());plans.setOnClickListener(v->toast("طرح‌های اشتراک از پنل مدیرکل ارائه می‌شوند."));refresh.setOnClickListener(v->loadDashboard());out.setOnClickListener(v->{session="";showLogin();});}
+ TextView card(String a,String b){TextView t=tv(a+"\n"+b,18,true);t.setBackgroundColor(Color.WHITE);margin(t,0,6,0,6);return t;}
+ void unitsPage(){base("واحدها و ساکنان","مدیریت واحدهای ساختمان");Button add=btn("＋ افزودن واحد");root.addView(add);add.setOnClickListener(v->addUnitDialog());loadDashboard();}
+ void chargesPage(){base("شارژ و هزینه‌ها","ثبت هزینه و مشاهده سوابق");Button add=btn("＋ ثبت هزینه / تعمیرات");root.addView(add);add.setOnClickListener(v->addChargeDialog());loadDashboard();}
+ void addUnitDialog(){LinearLayout x=new LinearLayout(this);x.setOrientation(LinearLayout.VERTICAL);EditText no=inp("شماره واحد",false),cnt=inp("تعداد نفرات",false),rn=inp("نام ساکن (اختیاری)",false);x.addView(no);x.addView(cnt);x.addView(rn);new AlertDialog.Builder(this).setTitle("افزودن واحد").setView(x).setNegativeButton("انصراف",null).setPositiveButton("ثبت",(d,w)->{JSONObject q=new JSONObject();put(q,"action","add_unit");put(q,"unit_no",no.getText().toString());put(q,"residents_count",parse(cnt.getText().toString(),1));put(q,"resident_name",rn.getText().toString());request(q);}).show();}
+ void addChargeDialog(){LinearLayout x=new LinearLayout(this);x.setOrientation(LinearLayout.VERTICAL);EditText title=inp("عنوان",false),amt=inp("مبلغ (ریال)",false),desc=inp("توضیحات",false);x.addView(title);x.addView(amt);x.addView(desc);new AlertDialog.Builder(this).setTitle("ثبت هزینه").setView(x).setNegativeButton("انصراف",null).setPositiveButton("ثبت",(d,w)->{JSONObject q=new JSONObject();put(q,"action","add_charge");put(q,"title",title.getText().toString());put(q,"amount_rial",parse(amt.getText().toString(),0));put(q,"charge_type","expense");put(q,"description",desc.getText().toString());request(q);}).show();}
+ void loadDashboard(){JSONObject q=new JSONObject();put(q,"action","dashboard");request(q);}
+ void request(JSONObject q){new Thread(()->{try{HttpURLConnection c=(HttpURLConnection)new URL(API).openConnection();c.setRequestMethod("POST");c.setRequestProperty("Content-Type","application/json");if(!session.isEmpty())c.setRequestProperty("Authorization","Bearer "+session);c.setDoOutput(true);c.getOutputStream().write(q.toString().getBytes(StandardCharsets.UTF_8));int code=c.getResponseCode();InputStream in=code>=400?c.getErrorStream():c.getInputStream();BufferedReader br=new BufferedReader(new InputStreamReader(in,StandardCharsets.UTF_8));StringBuilder sb=new StringBuilder();String line;while((line=br.readLine())!=null)sb.append(line);JSONObject o=new JSONObject(sb.toString());runOnUiThread(()->handle(q.optString("action"),o,code));}catch(Exception e){runOnUiThread(()->toast("ارتباط با سامانه ناموفق بود"));}}).start();}
+ void handle(String action,JSONObject o,int code){if(code>=400){toast(o.optString("error","خطا"));return;}if(action.equals("login_manager")||action.equals("register_manager")){session=o.optString("session","");building=o.optJSONObject("building");showDashboard();return;}if(action.equals("dashboard")){JSONArray us=o.optJSONArray("units"),cs=o.optJSONArray("charges");if(us!=null)root.addView(tv("تعداد واحدها: "+us.length(),16,true));if(cs!=null)for(int i=0;i<Math.min(20,cs.length());i++){JSONObject z=cs.optJSONObject(i);root.addView(card(z.optString("title"),z.optString("amount_rial")+" ریال"));}return;}toast("عملیات با موفقیت انجام شد");}
+ static void put(JSONObject o,String k,Object v){try{o.put(k,v);}catch(Exception ignored){}}
+ static int parse(String s,int d){try{return Integer.parseInt(s.replace(",",""));}catch(Exception e){return d;}}
+ void toast(String s){Toast.makeText(this,s,Toast.LENGTH_SHORT).show();}
+ void margin(View v,int l,int t,int r,int b){LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,LinearLayout.LayoutParams.WRAP_CONTENT);p.setMargins(l,t,r,b);v.setLayoutParams(p);}
 }
