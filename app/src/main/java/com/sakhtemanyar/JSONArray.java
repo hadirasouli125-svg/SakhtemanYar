@@ -7,6 +7,8 @@ public class JSONArray {
     public JSONObject optJSONObject(int index) {
         if (value == null) return null;
         org.json.JSONObject child = value.optJSONObject(index);
-        return child == null ? null : new JSONObject(child.toString());
+        if (child == null) return null;
+        try { return new JSONObject(child.toString()); }
+        catch (org.json.JSONException e) { return null; }
     }
 }
