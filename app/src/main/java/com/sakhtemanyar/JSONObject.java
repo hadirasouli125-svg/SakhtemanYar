@@ -23,7 +23,7 @@ public class JSONObject {
     public JSONObject optJSONObject(String key) {
         org.json.JSONObject child = value.optJSONObject(key);
         if (child == null) return null;
-        return new JSONObject(child.toString());
+        try { return new JSONObject(child.toString()); } catch (org.json.JSONException e) { return null; }
     }
     @Override public String toString() { return value.toString(); }
 }
