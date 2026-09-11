@@ -20,10 +20,6 @@ public class JSONObject {
     public double optDouble(String key) { return value.optDouble(key); }
     public boolean optBoolean(String key) { return value.optBoolean(key); }
     public JSONArray optJSONArray(String key) { return value.optJSONArray(key); }
-    public JSONObject optJSONObject(String key) {
-        org.json.JSONObject child = value.optJSONObject(key);
-        if (child == null) return null;
-        try { return new JSONObject(child.toString()); } catch (org.json.JSONException e) { return null; }
-    }
+    public org.json.JSONObject optJSONObject(String key) { return value.optJSONObject(key); }
     @Override public String toString() { return value.toString(); }
 }
