@@ -14,8 +14,8 @@ jobs:
         run: python3 tools/patch_logo_picker.py
       - name: Patch charge and receipt UI
         run: python3 tools/patch_charges_receipts.py
-      - name: Patch final UI
-        run: python3 tools/patch_final_ui.py
+      - name: Patch final payment UI
+        run: python3 tools/patch_final_ui2.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
