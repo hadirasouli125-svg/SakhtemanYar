@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
-    <application android:theme="@style/AppTheme" android:label="ساختمان‌یار" android:allowBackup="false" android:supportsRtl="true">
+    <application android:theme="@style/AppTheme" android:label="بنیار" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher" android:allowBackup="false" android:supportsRtl="true">
         <activity android:name="com.sakhtemanyar.AdminActivity" android:screenOrientation="portrait" android:exported="false" />
         <activity android:name="com.sakhtemanyar.MainActivity" android:screenOrientation="portrait" android:exported="true">
             <intent-filter>
