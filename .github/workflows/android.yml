@@ -3,11 +3,85 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Add phone gallery logo picker
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('app/src/main/java/com/sakhtemanyar/AdminActivity.java')
+          s = p.read_text(encoding='utf-8')
+          marker = 'LinearLayout root,body; String session="";'
+          replacement = 'LinearLayout root,body; String session=""; EditText logoInput; ImageView logoPreview;'
+          if marker not in s:
+              raise SystemExit('field marker not found')
+          s = s.replace(marker, replacement, 1)
+          method = r'''    @Override protected void onActivityResult(int requestCode,int resultCode,android.content.Intent data){
+        super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode!=901 || resultCode!=RESULT_OK || data==null || data.getData()==null) return;
+        final android.net.Uri uri=data.getData();
+        io.submit(()->{
+            try{
+                java.io.InputStream in=getContentResolver().openInputStream(uri);
+                android.graphics.Bitmap src=android.graphics.BitmapFactory.decodeStream(in);
+                if(in!=null) in.close();
+                if(src==null) throw new Exception("image");
+                int w=src.getWidth(), h=src.getHeight();
+                float scale=Math.min(1f,256f/Math.max(w,h));
+                android.graphics.Bitmap bmp=src;
+                if(scale<1f) bmp=android.graphics.Bitmap.createScaledBitmap(src,Math.max(1,(int)(w*scale)),Math.max(1,(int)(h*scale)),true);
+                java.io.ByteArrayOutputStream out=new java.io.ByteArrayOutputStream();
+                bmp.compress(android.graphics.Bitmap.CompressFormat.JPEG,82,out);
+                String dataUri="data:image/jpeg;base64,"+android.util.Base64.encodeToString(out.toByteArray(),android.util.Base64.NO_WRAP);
+                if(bmp!=src) src.recycle();
+                final android.graphics.Bitmap preview=bmp;
+                runOnUiThread(()->{
+                    if(logoInput!=null) logoInput.setText(dataUri);
+                    if(logoPreview!=null){ logoPreview.setImageBitmap(preview); logoPreview.setVisibility(View.VISIBLE); }
+                    toast("لوگو آماده ذخیره است؛ دکمه ذخیره تنظیمات را بزنید");
+                });
+            }catch(Exception e){ runOnUiThread(()->toast("انتخاب لوگو ناموفق بود")); }
+        });
+    }
+'''
+          if 'requestCode!=901' not in s:
+              pos=s.find('    void settings(JSONObject all){')
+              if pos<0: raise SystemExit('settings marker not found')
+              s=s[:pos]+method+s[pos:]
+          start=s.find('    void settings(JSONObject all){')
+          end=s.find('    void finance(){', start)
+          if start<0 or end<0: raise SystemExit('settings boundaries not found')
+          new_method = r'''    void settings(JSONObject all){
+        base("تنظیمات سامانه");
+        title("تنظیمات مرکزی");
+        body.addView(tv("نام، دوره آزمایشی و اطلاعات پشتیبانی سامانه را مدیریت کنید.",12,muted),new LinearLayout.LayoutParams(-1,dp(42)));
+        org.json.JSONObject s=all.optJSONObject("settings");
+        final EditText name=input("نام برنامه"), trial=input("تعداد روز دوره آزمایشی"), phone=input("شماره پشتیبانی"), email=input("ایمیل پشتیبانی");
+        logoInput=input("آدرس لوگو یا تصویر انتخاب‌شده");
+        logoInput.setText(safe(s==null?"":s.optString("logo_url")));
+        logoInput.setTextSize(10);
+        name.setText(safe(s==null?"":s.optString("app_name"))); trial.setText(safe(s==null?"":s.optString("free_trial_days"))); phone.setText(safe(s==null?"":s.optString("support_phone"))); email.setText(safe(s==null?"":s.optString("support_email")));
+        fieldLabel("اسم برنامه","نامی که در برنامه به کاربران نمایش داده می‌شود"); body.addView(name,new LinearLayout.LayoutParams(-1,dp(56))); body.addView(gap(10));
+        fieldLabel("دوره آزمایشی","تعداد روز استفاده رایگان ساختمان‌ها"); body.addView(trial,new LinearLayout.LayoutParams(-1,dp(56))); body.addView(gap(10));
+        fieldLabel("شماره پشتیبانی","شماره‌ای که برای تماس با پشتیبانی نمایش داده می‌شود"); body.addView(phone,new LinearLayout.LayoutParams(-1,dp(56))); body.addView(gap(10));
+        fieldLabel("ایمیل پشتیبانی","ایمیل تماس با پشتیبانی سامانه"); body.addView(email,new LinearLayout.LayoutParams(-1,dp(56))); body.addView(gap(12));
+        fieldLabel("لوگوی برنامه","عکس لوگو را مستقیم از گالری گوشی انتخاب کنید");
+        LinearLayout logoBox=new LinearLayout(this); logoBox.setGravity(Gravity.CENTER_VERTICAL); logoBox.setPadding(dp(8),dp(8),dp(8),dp(8)); logoBox.setBackground(bg(white,18));
+        logoPreview=new ImageView(this); logoPreview.setScaleType(ImageView.ScaleType.CENTER_INSIDE); logoPreview.setPadding(dp(5),dp(5),dp(5),dp(5)); logoPreview.setBackground(bg(Color.rgb(239,243,248),14)); logoBox.addView(logoPreview,new LinearLayout.LayoutParams(dp(76),dp(76)));
+        Button pick=btn("انتخاب عکس از گوشی",teal); LinearLayout.LayoutParams pp=new LinearLayout.LayoutParams(0,dp(56),1); pp.setMargins(dp(10),0,0,0); logoBox.addView(pick,pp); body.addView(logoBox,new LinearLayout.LayoutParams(-1,dp(92)));
+        pick.setOnClickListener(v->{android.content.Intent i=new android.content.Intent(android.content.Intent.ACTION_OPEN_DOCUMENT); i.addCategory(android.content.Intent.CATEGORY_OPENABLE); i.setType("image/*"); startActivityForResult(i,901);});
+        body.addView(gap(8)); body.addView(logoInput,new LinearLayout.LayoutParams(-1,dp(52)));
+        Button save=btn("ذخیره تنظیمات",teal); body.addView(save,new LinearLayout.LayoutParams(-1,dp(54)));
+        save.setOnClickListener(v->{try{String dayText=trial.getText().toString().trim();if(dayText.isEmpty())dayText="30";callObj(new JSONObject().put("action","admin_update_settings").put("app_name",safe(name.getText().toString().trim())).put("free_trial_days",Integer.parseInt(dayText)).put("support_phone",safe(phone.getText().toString().trim())).put("support_email",safe(email.getText().toString().trim())).put("logo_url",safe(logoInput.getText().toString().trim())),z->toast("تنظیمات با موفقیت ذخیره شد"));}catch(Exception e){toast("تعداد روز دوره آزمایشی باید عدد باشد");}});
+    }
+'''
+          s=s[:start]+new_method+s[end:]
+          p.write_text(s,encoding='utf-8')
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
