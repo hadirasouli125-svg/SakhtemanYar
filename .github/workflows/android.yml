@@ -12,6 +12,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Patch admin logo picker
         run: python3 tools/patch_logo_picker.py
+      - name: Patch charge and receipt UI
+        run: python3 tools/patch_charges_receipts.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -22,5 +24,5 @@ jobs:
       - run: gradle assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
         with:
-          name: SakhtemanYar-logo-picker-debug-apk
+          name: SakhtemanYar-charge-receipt-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
