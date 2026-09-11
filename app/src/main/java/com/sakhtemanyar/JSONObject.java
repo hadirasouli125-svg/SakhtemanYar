@@ -1,7 +1,5 @@
 package com.sakhtemanyar;
 
-import org.json.JSONArray;
-
 public class JSONObject {
     private final org.json.JSONObject value;
 
@@ -19,7 +17,10 @@ public class JSONObject {
     public int optInt(String key) { return value.optInt(key); }
     public double optDouble(String key) { return value.optDouble(key); }
     public boolean optBoolean(String key) { return value.optBoolean(key); }
-    public JSONArray optJSONArray(String key) { return value.optJSONArray(key); }
+    public JSONArray optJSONArray(String key) {
+        org.json.JSONArray a = value.optJSONArray(key);
+        return a == null ? null : new JSONArray(a);
+    }
     public org.json.JSONObject optJSONObject(String key) { return value.optJSONObject(key); }
     @Override public String toString() { return value.toString(); }
 }
