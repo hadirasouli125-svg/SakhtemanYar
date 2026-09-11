@@ -5,6 +5,7 @@ public class JSONObject {
 
     public JSONObject() { value = new org.json.JSONObject(); }
     public JSONObject(String json) throws org.json.JSONException { value = new org.json.JSONObject(json); }
+    public JSONObject(org.json.JSONObject object) { value = object == null ? new org.json.JSONObject() : object; }
 
     public JSONObject put(String key, Object val) {
         try { value.put(key, val); } catch (org.json.JSONException ignored) {}
@@ -21,6 +22,9 @@ public class JSONObject {
         org.json.JSONArray a = value.optJSONArray(key);
         return a == null ? null : new JSONArray(a);
     }
-    public org.json.JSONObject optJSONObject(String key) { return value.optJSONObject(key); }
+    public JSONObject optJSONObject(String key) {
+        org.json.JSONObject a = value.optJSONObject(key);
+        return a == null ? null : new JSONObject(a);
+    }
     @Override public String toString() { return value.toString(); }
 }
