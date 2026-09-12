@@ -40,6 +40,8 @@ jobs:
         run: python3 tools/patch_subscription_v11_fix.py
       - name: Patch all panels responsive sizing
         run: python3 tools/patch_responsive_all.py
+      - name: Restore missing MainActivity methods
+        run: python3 tools/restore_missing_main_methods.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -51,5 +53,5 @@ jobs:
       - run: cp app/build/outputs/apk/debug/app-debug.apk 'ساختمان یار.apk'
       - uses: actions/upload-artifact@v4
         with:
-          name: SakhtemanYar-v12-responsive-subscription-apk
+          name: SakhtemanYar-v13-clean-subscription-apk
           path: 'ساختمان یار.apk'
