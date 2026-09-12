@@ -1,9 +1,19 @@
 from pathlib import Path
-p=Path('app/src/main/java/com/sakhtemanyar/MainActivity.java'); s=p.read_text(encoding='utf-8')
-if '    void repairDialog(' not in s:
-    marker='    void repairs(){'
-    method='''    void repairDialog(){call("dashboard",j->{final JSONArray us=j.optJSONArray("units");if(us==null||us.length()==0){toast("ابتدا واحدها را ثبت کنید");return;}final String[] labels=new String[us.length()];for(int i=0;i<us.length();i++)labels[i]="واحد "+us.optJSONObject(i).optString("unit_no");final EditText t=input("عنوان تعمیر"),a=input("مبلغ به تومان"),d=input("توضیحات");receiptData="";receiptButton=btn("＋ آپلود عکس / فیش تعمیرات",red);LinearLayout l=new LinearLayout(this);l.setOrientation(LinearLayout.VERTICAL);l.setPadding(dp(10),0,dp(10),0);for(EditText e:new EditText[]{t,a,d}){l.addView(e,new LinearLayout.LayoutParams(-1,dp(54)));l.addView(gap(7));}l.addView(receiptButton,new LinearLayout.LayoutParams(-1,dp(50)));receiptButton.setOnClickListener(v->{uploadTarget=3;pickImage();});new AlertDialog.Builder(this).setTitle("ثبت تعمیرات").setMultiChoiceItems(labels,null,(q,w,c)->{}).setView(l).setNegativeButton("لغو",null).setPositiveButton("ثبت تعمیر",(q,w)->{long rial=Math.max(0,parseMoney(a.getText().toString())*10);ListView list=((AlertDialog)q).getListView();JSONArray selected=new JSONArray();for(int i=0;i<us.length();i++)if(list!=null&&list.isItemChecked(i))selected.put(us.optJSONObject(i).optString("id"));if(selected.length()==0){toast("حداقل یک واحد را انتخاب کنید");return;}callObj(new JSONObject().put("action","add_repair").put("title",t.getText().toString().trim()).put("amount_rial",rial).put("description",d.getText().toString().trim()).put("unit_ids",selected).put("receipt_url",receiptData),z->{receiptData="";receiptButton=null;toast("تعمیر ثبت شد");repairs();});}).show();});}\n'''
-    s=s.replace(marker,method+marker,1); p.write_text(s,encoding='utf-8')
-# Reuse the tested v3 replacements after ensuring repairDialog exists.
+p=Path('app/src/main/java/com/sakhtemanyar/MainActivity.java')
+s=p.read_text(encoding='utf-8')
 exec(Path('tools/patch_v3_ui.py').read_text(encoding='utf-8'),globals())
-print('v4 applied')
+today='new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(new java.util.Date())'
+s=s.replace('final EditText t=input("عنوان هزینه"),a=input("مبلغ کل به تومان"),d=input("توضیحات");','final EditText t=input("عنوان هزینه"),a=input("مبلغ کل به تومان"),d=input("توضیحات"),date=input("تاریخ هزینه (YYYY-MM-DD)");date.setText('+today+');')
+s=s.replace('for(EditText e:new EditText[]{t,a,d})','for(EditText e:new EditText[]{t,a,d,date})',1)
+s=s.replace('.put("description",d.getText().toString().trim()).put("allocation_method",alloc)', '.put("description",d.getText().toString().trim()).put("due_date",date.getText().toString().trim()).put("allocation_method",alloc)',1)
+s=s.replace('final EditText t=input("عنوان تعمیر"),a=input("مبلغ به تومان"),d=input("توضیحات");','final EditText t=input("عنوان تعمیر"),a=input("مبلغ به تومان"),d=input("توضیحات"),date=input("تاریخ تعمیر (YYYY-MM-DD)");date.setText('+today+');')
+s=s.replace('for(EditText e:new EditText[]{t,a,d})','for(EditText e:new EditText[]{t,a,d,date})',1)
+s=s.replace('.put("description",d.getText().toString().trim()).put("unit_ids",selected)', '.put("description",d.getText().toString().trim()).put("repair_date",date.getText().toString().trim()).put("unit_ids",selected)',1)
+s=s.replace('EditText a=input("مبلغ پرداخت به تومان"),n=input("توضیحات / شماره پیگیری");', 'EditText a=input("مبلغ پرداخت به تومان"),n=input("توضیحات / شماره پیگیری"),date=input("تاریخ پرداخت (YYYY-MM-DD)");date.setText('+today+');')
+s=s.replace('l.addView(a,new LinearLayout.LayoutParams(-1,dp(54)));l.addView(gap(8));l.addView(n,new LinearLayout.LayoutParams(-1,dp(54)));', 'l.addView(a,new LinearLayout.LayoutParams(-1,dp(54)));l.addView(gap(8));l.addView(n,new LinearLayout.LayoutParams(-1,dp(54)));l.addView(gap(8));l.addView(date,new LinearLayout.LayoutParams(-1,dp(54)));',1)
+s=s.replace('.put("amount_rial",rial).put("note",n.getText().toString().trim()).put("receipt_url",receiptData)', '.put("amount_rial",rial).put("paid_at",date.getText().toString().trim()).put("note",n.getText().toString().trim()).put("receipt_url",receiptData)',1)
+s=s.replace('final EditText n=input("شماره پیگیری / توضیحات");receiptData="";', 'final EditText n=input("شماره پیگیری / توضیحات"),date=input("تاریخ پرداخت (YYYY-MM-DD)");date.setText('+today+');receiptData="";',1)
+s=s.replace('l.addView(n,new LinearLayout.LayoutParams(-1,dp(54)));l.addView(gap(8));l.addView(receiptButton', 'l.addView(n,new LinearLayout.LayoutParams(-1,dp(54)));l.addView(gap(8));l.addView(date,new LinearLayout.LayoutParams(-1,dp(54)));l.addView(gap(8));l.addView(receiptButton',1)
+s=s.replace('.put("repair_id",repairId==null?JSONObject.NULL:repairId).put("note",n.getText().toString().trim())', '.put("repair_id",repairId==null?JSONObject.NULL:repairId).put("paid_at",date.getText().toString().trim()).put("note",n.getText().toString().trim())',1)
+p.write_text(s,encoding='utf-8')
+print('v4 dates applied')
