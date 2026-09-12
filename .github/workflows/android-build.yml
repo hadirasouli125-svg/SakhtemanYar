@@ -40,6 +40,8 @@ jobs:
         run: python3 tools/patch_admin_responsive_layout.py
       - name: Patch subscription V11
         run: python3 tools/patch_subscription_v11.py
+      - name: Patch all panels responsive sizing
+        run: python3 tools/patch_responsive_all.py
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -56,5 +58,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: SakhtemanYar-v11-subscription-apk
+          name: SakhtemanYar-v12-responsive-subscription-apk
           path: 'ساختمان یار.apk'
