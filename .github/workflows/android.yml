@@ -34,6 +34,8 @@ jobs:
         run: python3 tools/patch_finance_report_v9.py
       - name: Patch responsive master-admin cards
         run: python3 tools/patch_admin_responsive_layout.py
+      - name: Patch subscription V11
+        run: python3 tools/patch_subscription_v11.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -45,5 +47,5 @@ jobs:
       - run: cp app/build/outputs/apk/debug/app-debug.apk 'ساختمان یار.apk'
       - uses: actions/upload-artifact@v4
         with:
-          name: SakhtemanYar-v10-admin-responsive-apk
+          name: SakhtemanYar-v11-subscription-apk
           path: 'ساختمان یار.apk'
