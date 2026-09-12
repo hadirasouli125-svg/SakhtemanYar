@@ -48,6 +48,8 @@ jobs:
         run: python3 tools/patch_subscription_v15_fix.py
       - name: Final regression and UI patch V17
         run: python3 tools/patch_final_regression_v17.py
+      - name: V17 compile fix
+        run: python3 tools/patch_v17_compile_fix.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
