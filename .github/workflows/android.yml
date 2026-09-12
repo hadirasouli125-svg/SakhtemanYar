@@ -50,6 +50,8 @@ jobs:
         run: python3 tools/patch_final_regression_v17.py
       - name: V17 compile fix
         run: python3 tools/patch_v17_compile_fix.py
+      - name: Apply V18 full audit patch
+        run: python3 tools/patch_v18_full_audit.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -61,5 +63,5 @@ jobs:
       - run: cp app/build/outputs/apk/debug/app-debug.apk 'ساختمان یار.apk'
       - uses: actions/upload-artifact@v4
         with:
-          name: SakhtemanYar-v17-regression-fixed-apk
+          name: SakhtemanYar-v18-full-audit-apk
           path: 'ساختمان یار.apk'
