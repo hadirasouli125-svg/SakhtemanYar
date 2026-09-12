@@ -24,6 +24,8 @@ jobs:
         run: python3 tools/patch_v4_ui.py
       - name: Patch v5 multi-unit and Persian date UI
         run: python3 tools/patch_v5_ui.py
+      - name: Patch v6 compile compatibility
+        run: python3 tools/patch_v6_compile.py
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
