@@ -54,6 +54,8 @@ jobs:
         run: python3 tools/patch_v18_full_audit.py
       - name: Fix V18 raw network method
         run: python3 tools/patch_v18_fix.py
+      - name: Fix V18 loading helpers
+        run: python3 tools/patch_v18_fix2.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
