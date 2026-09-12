@@ -14,10 +14,24 @@ jobs:
         run: python3 tools/patch_logo_picker.py
       - name: Patch charge and receipt UI
         run: python3 tools/patch_charges_receipts.py
-      - name: Patch final payment UI
+      - name: Patch final UI
         run: python3 tools/patch_final_ui2.py
-      - name: Patch final v4 UI
+      - name: Patch dates safely
         run: python3 tools/patch_v4_ui.py
+      - name: Patch v5 multi-unit and Persian date UI
+        run: python3 tools/patch_v5_ui.py
+      - name: Patch v6 compile compatibility
+        run: python3 tools/patch_v6_compile.py
+      - name: Patch v7 card layout
+        run: python3 tools/patch_v7_layout.py
+      - name: Patch finance v8 workflow
+        run: python3 tools/patch_finance_v8.py
+      - name: Fix finance v8 Java escaping
+        run: python3 tools/patch_finance_v8_fix.py
+      - name: Fix finance v8 lambda capture
+        run: python3 tools/patch_finance_v8_lambda_fix.py
+      - name: Patch finance reports, settlements and admin layout V9
+        run: python3 tools/patch_finance_report_v9.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -26,7 +40,8 @@ jobs:
         with:
           gradle-version: '8.10.2'
       - run: gradle assembleDebug --no-daemon
+      - run: cp app/build/outputs/apk/debug/app-debug.apk 'ساختمان یار.apk'
       - uses: actions/upload-artifact@v4
         with:
-          name: SakhtemanYar-v3-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: SakhtemanYar-v9-finance-apk
+          path: 'ساختمان یار.apk'
