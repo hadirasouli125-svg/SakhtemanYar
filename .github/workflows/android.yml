@@ -36,6 +36,8 @@ jobs:
         run: python3 tools/patch_admin_responsive_layout.py
       - name: Patch subscription V11
         run: python3 tools/patch_subscription_v11.py
+      - name: Remove duplicate receipt callback
+        run: python3 tools/patch_subscription_v11_fix.py
       - name: Patch all panels responsive sizing
         run: python3 tools/patch_responsive_all.py
       - uses: actions/setup-java@v4
