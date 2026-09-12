@@ -19,7 +19,11 @@ jobs:
       - name: Patch charge and receipt UI
         run: python3 tools/patch_charges_receipts.py
       - name: Patch final UI
-        run: python3 tools/patch_final_ui.py
+        run: python3 tools/patch_final_ui2.py
+      - name: Patch v2 allocation and detail UI
+        run: python3 tools/patch_v2_ui.py
+      - name: Patch v3 final payment and allocation UI
+        run: python3 tools/patch_v3_ui.py
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -34,5 +38,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Bonyar-final-debug-apk
+          name: Bonyar-v2-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
