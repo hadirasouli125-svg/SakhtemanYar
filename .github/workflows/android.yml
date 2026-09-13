@@ -4,25 +4,14 @@ on:
     branches: [main]
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Materialize web session security
-        run: python3 tools/patch_web_session_security.py
-      - name: Materialize generated source
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/src/main/java app/page.tsx
-          if git diff --cached --quiet; then
-            echo "Source already matches repository source."
-          else
-            git commit -m "chore: materialize generated source"
-            git push origin "HEAD:${GITHUB_REF_NAME}"
-          fi
+      - name: Deterministic regression checks
+        run: python3 tools/regression_check.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
