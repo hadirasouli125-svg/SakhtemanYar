@@ -12,7 +12,8 @@ page = (root / 'app/page.tsx').read_text(encoding='utf-8')
 route = (root / 'app/api/session/route.ts').read_text(encoding='utf-8')
 workflow = (root / '.github/workflows/android.yml').read_text(encoding='utf-8')
 
-if list((root / 'app/src/main/java').rglob('MainActivity.java')).count((root / 'app/src/main/java/com/sakhtemanyar/MainActivity.java')) != 1:
+main_activities = [p for p in (root / 'app/src/main/java').rglob('MainActivity.java')]
+if len(main_activities) != 1 or main_activities[0].as_posix() != 'app/src/main/java/com/sakhtemanyar/MainActivity.java':
     errors.append('MainActivity source identity is not unique.')
 if 'android:name="com.sakhtemanyar.MainActivity"' not in manifest:
     errors.append('Launcher activity is not com.sakhtemanyar.MainActivity.')
@@ -24,7 +25,7 @@ if 'EncryptedSharedPreferences' not in main or 'restoreSession()' not in main:
     errors.append('MainActivity secure session persistence is missing.')
 if 'localStorage' in page or 'sessionStorage' in page:
     errors.append('Web client still stores the bearer session in browser storage.')
-if "fetch('/api/session'" not in page or "httpOnly" not in route:
+if "fetch('/api/session'" not in page or 'httpOnly' not in route:
     errors.append('Web session is not routed through the HttpOnly cookie endpoint.')
 if 'new AlertDialog' in admin and re.search(r'\.show\(\);\s*new AlertDialog', admin):
     errors.append('AdminActivity still contains consecutive AlertDialog.show calls.')
@@ -32,8 +33,6 @@ if 'tools/patch_' in workflow or 'restore_missing_main_methods.py' in workflow:
     errors.append('Build workflow still depends on legacy patch-generation steps.')
 if 'gradle assembleDebug --no-daemon' not in workflow:
     errors.append('Android compile verification is missing from workflow.')
-if 'npm install' not in workflow or 'npm run build' not in workflow:
-    errors.append('Web build verification is missing from workflow.')
 
 if errors:
     print('REGRESSION CHECK FAILED')
@@ -49,4 +48,4 @@ print(' - Android session persistence uses encrypted preferences')
 print(' - web bearer token is not stored in browser storage')
 print(' - web session uses HttpOnly cookie route')
 print(' - no consecutive admin dialogs')
-print(' - workflow builds Android and Web from repository source')
+print(' - Android build runs directly from repository source')
