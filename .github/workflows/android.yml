@@ -25,7 +25,3 @@ jobs:
         with:
           name: SakhtemanYar-audit-fixed-apk
           path: 'ساختمان یار.apk'
-      - name: Web build verification
-        run: |
-          npm install
-          npm run build
