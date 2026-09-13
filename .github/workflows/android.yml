@@ -60,15 +60,17 @@ jobs:
         run: python3 tools/patch_v18_fix3.py
       - name: Fix V18 BuildConfig import
         run: python3 tools/patch_v18_fix4.py
-      - name: Materialize generated Android source
+      - name: Patch web session security
+        run: python3 tools/patch_web_session_security.py
+      - name: Materialize generated source
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/src/main/java
+          git add app/src/main/java app/page.tsx
           if git diff --cached --quiet; then
-            echo "Generated Android source already matches repository source."
+            echo "Generated source already matches repository source."
           else
-            git commit -m "chore: materialize generated Android source"
+            git commit -m "chore: materialize generated source"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
       - uses: actions/setup-java@v4
