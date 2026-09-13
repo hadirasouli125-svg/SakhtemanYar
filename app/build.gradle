@@ -4,6 +4,6 @@ dependencies {
     implementation 'androidx.security:security-crypto:1.1.0-alpha06'
 }
 
-android { namespace 'ir.sakhtemanyar.app'; compileSdk 35
-    defaultConfig { applicationId 'ir.sakhtemanyar.app'; minSdk 23; targetSdk 35; versionCode 1; versionName '1.0.0' }
+android { buildFeatures { buildConfig true }; namespace 'ir.sakhtemanyar.app'; compileSdk 35
+    defaultConfig { applicationId 'ir.sakhtemanyar.app'; minSdk 23; targetSdk 35; versionCode 1; versionName '1.0.0'; buildConfigField 'String', 'API_BASE_URL', '"https://okizneyesdwiundvadpe.supabase.co/functions/v1/api_gateway"' }
 }
