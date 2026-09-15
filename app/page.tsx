@@ -7,11 +7,12 @@ function jalali(value: string) {
   const m = value.match(/(\d{4})-(\d{2})-(\d{2})/)
   if (!m) return value
   const gy=Number(m[1]),gm=Number(m[2]),gd=Number(m[3]); const gdm=[0,31,59,90,120,151,181,212,243,273,304,334]
-  let jy=gy-621; const gy2=gm>2?gy+1:gy
-  const days=365*(gy-1600)+Math.floor((gy2-1600+3)/4)-Math.floor((gy2-1600+99)/100)+Math.floor((gy2-1600+399)/400)-80+gd+gdm[gm-1]
-  const jDays=days-79; jy=979+33*Math.floor(jDays/12053); let d=jDays%12053; jy+=4*Math.floor(d/1461); d%=1461
-  if(d>365){jy+=Math.floor((d-1)/365);d=(d-1)%365}; const jm=d<186?1+Math.floor(d/31):7+Math.floor((d-186)/30); const jd=1+(d<186?d%31:(d-186)%30)
-  return `${jy}/${String(jm).padStart(2,'0')}/${String(jd).padStart(2,'0')}`
+  let days=365*(gy-1600)+Math.floor((gy-1603)/4)-Math.floor((gy-1599)/100)+Math.floor((gy-1599)/400)+gd+gdm[gm-1]
+  if(gm>2&&((gy%4===0&&gy%100!==0)||gy%400===0))days++
+  let jDays=days-79; let jy=979+33*Math.floor(jDays/12053); let d=jDays%12053; jy+=4*Math.floor(d/1461); d%=1461
+  if(d>365){jy+=Math.floor((d-1)/365);d=(d-1)%365}
+  const jm=d<186?1+Math.floor(d/31):7+Math.floor((d-186)/30),jday=1+(d<186?d%31:(d-186)%30)
+  return `${jy}/${String(jm).padStart(2,'0')}/${String(jday).padStart(2,'0')}`
 }
 
 async function call(action: string, body: Record<string, any> = {}) {
