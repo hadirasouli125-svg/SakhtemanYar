@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Apply targeted receipt fix
+        run: python3 tools/patch_charges_receipts.py
       - name: Deterministic regression checks
         run: python3 tools/regression_check.py
       - name: Web build regression check
