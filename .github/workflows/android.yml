@@ -12,6 +12,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Apply receipt result fix
         run: python3 tools/fix_receipt_result.py
+      - name: Apply resident management fix
+        run: python3 tools/fix_resident_management.py
       - name: Deterministic regression checks
         run: python3 tools/regression_check.py
       - name: Web build regression check
